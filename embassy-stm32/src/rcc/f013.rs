@@ -190,8 +190,10 @@ pub(crate) unsafe fn init(config: Config) {
             PllSource::HSI48 => (Pllsrc::HSI48_DIV_PREDIV, unwrap!(hsi48)),
         };
         let in_freq = src_freq / pll.prediv;
+        #[cfg(not(feature = "overclocking"))]
         assert!(max::PLL_IN.contains(&in_freq));
         let out_freq = in_freq * pll.mul;
+        #[cfg(not(feature = "overclocking"))]
         assert!(max::PLL_OUT.contains(&out_freq));
 
         #[cfg(not(stm32f1))]
@@ -237,15 +239,21 @@ pub(crate) unsafe fn init(config: Config) {
     #[cfg(stm32f0)]
     let (pclk2, pclk2_tim) = (pclk1, pclk1_tim);
 
+    #[cfg(not(feature = "overclocking"))]
     assert!(max::HCLK.contains(&hclk));
+    #[cfg(not(feature = "overclocking"))]
     assert!(max::PCLK1.contains(&pclk1));
     #[cfg(not(stm32f0))]
+    #[cfg(not(feature = "overclocking"))]
     assert!(max::PCLK2.contains(&pclk2));
 
-    #[cfg(stm32f1)]
-    let adc = pclk2 / config.adc_pre;
-    #[cfg(stm32f1)]
-    assert!(max::ADC.contains(&adc));
+    #[cfg(not(feature = "overclocking"))]
+    {
+        #[cfg(stm32f1)]
+        let adc = pclk2 / config.adc_pre;
+        #[cfg(stm32f1)]
+        assert!(max::ADC.contains(&adc));
+    }
 
     // Set latency based on HCLK frquency
     #[cfg(stm32f0)]
@@ -428,13 +436,19 @@ mod max {
     #[cfg(rcc_f1cl)]
     pub(crate) const HSE_BYP: RangeInclusive<Hertz> = Hertz(1_000_000)..=Hertz(50_000_000);
 
+    #[cfg(not(feature = "overclocking"))]
     pub(crate) const HCLK: RangeInclusive<Hertz> = Hertz(0)..=Hertz(72_000_000);
+    #[cfg(not(feature = "overclocking"))]
     pub(crate) const PCLK1: RangeInclusive<Hertz> = Hertz(0)..=Hertz(36_000_000);
+    #[cfg(not(feature = "overclocking"))]
     pub(crate) const PCLK2: RangeInclusive<Hertz> = Hertz(0)..=Hertz(72_000_000);
 
+    #[cfg(not(feature = "overclocking"))]
     pub(crate) const PLL_IN: RangeInclusive<Hertz> = Hertz(1_000_000)..=Hertz(25_000_000);
+    #[cfg(not(feature = "overclocking"))]
     pub(crate) const PLL_OUT: RangeInclusive<Hertz> = Hertz(16_000_000)..=Hertz(72_000_000);
 
+    #[cfg(not(feature = "overclocking"))]
     pub(crate) const ADC: RangeInclusive<Hertz> = Hertz(0)..=Hertz(14_000_000);
 }
 

@@ -160,6 +160,9 @@ time-driver-tim23 = ["_time-driver"]
 ## Use TIM24 as time driver
 time-driver-tim24 = ["_time-driver"]
 
+## Disable frequency limitations for RCC (stm32f103)
+overclocking = []
+
 
 #! ## Analog Switch Pins (Pxy_C) on STM32H7 series
 #! Get `PXY` and `PXY_C` singletons. Digital impls are on `PXY`, Analog impls are on `PXY_C`
